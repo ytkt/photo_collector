@@ -2,18 +2,12 @@ require 'fileutils'
 require 'dotenv'
 Dotenv.load
 
-src_path = ENV['SRC_PATH']
-dest_path = ENV['DEST_PATH']
+SRC_PATH = ENV['SRC_PATH']
+DEST_PATH = ENV['DEST_PATH']
+puts SRC_PATH, DEST_PATH
 
-puts src_path, dest_path
 
-files = Dir.glob("#{src_path}/**/*.JPG")
-
-files.each do |filename_in_fullpath|
-  puts filename_in_fullpath
-
-  filename = filename_in_fullpath.split('/').last
-
+def build_dest_fullpath(dest_path:, filename:)
   dest_filename = filename
   if File.exist?(File.join(dest_path, dest_filename))
     chanks = filename.split('.')
@@ -24,9 +18,18 @@ files.each do |filename_in_fullpath|
       i += 1
     end
   end
+  File.join(dest_path, dest_filename)
+end
 
-  puts "copying... #{dest_filename}"
-  FileUtils.copy(filename_in_fullpath, File.join(dest_path, dest_filename))
+
+files = Dir.glob("#{SRC_PATH}/**/*.JPG")
+
+files.each do |filename_in_fullpath|
+  filename = filename_in_fullpath.split('/').last
+  dest_fullpath = build_dest_fullpath(dest_path: DEST_PATH, filename: filename)
+
+  puts "copying... #{dest_fullpath}"
+  FileUtils.copy(filename_in_fullpath, dest_fullpath)
 
   break
 end
